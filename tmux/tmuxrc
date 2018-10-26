@@ -27,3 +27,5 @@ set -g status-right-bg '#4e4e4e'
 
 set -g status-left-length 90
 set -g status-right-length 60
+
+set-option -g status-left "S-#S:W-#I:P-#P"
