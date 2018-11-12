@@ -21,6 +21,7 @@
 	changed = green
 	untracked = cyan
 [alias]
+    fb = "!f(){ git fetch \"$1\" && git rebase origin/master; };f"
     l = log --pretty=oneline --abbrev-commit
 	st = status -sb
 	ci = commit
