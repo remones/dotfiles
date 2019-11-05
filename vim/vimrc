@@ -1,95 +1,155 @@
-" Fix some tmux issues
-if &term =~ '256color'
-  set t_ut=
+" vim: set foldmarker={,} foldmethod=marker:
+
+" ensure plug.vim installed
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall
 endif
 
-" Better modes.  Remeber where we are
-set viminfo=!,'100,\"100,:20,<50,s10,h,n~/.viminfo
+" plugins {
+call plug#begin()
+" Appearance
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'luochen1990/rainbow'
+Plug 'ntpeters/vim-better-whitespace'
+Plug 'joshdick/onedark.vim'
+Plug 'nightsense/cosmic_latte'
+Plug 'liuchengxu/space-vim-theme'
 
-" Pathogen
-call pathogen#infect()
+" Effective
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-unimpaired'
+Plug 'easymotion/vim-easymotion'
+Plug 'tpope/vim-surround'
+Plug 'jiangmiao/auto-pairs'
+Plug 'tomtom/tcomment_vim'
+Plug 'alvan/vim-closetag'
 
-" Enable Syntax Colors
-syntax on
+" Git
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
 
-" Install bundles
-if filereadable(expand("~/.vimrc.bundles"))
-  source ~/.vimrc.bundles
-endif
+" Tool
+Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'mbbill/undotree', { 'on': 'UndotreeToggle' }
+Plug 'svermeulen/vim-easyclip'
+Plug 'godlygeek/tabular'
 
+" Fzf
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
 
-" Modifiy leader key
+" Pane
+Plug 'szw/vim-maximizer'
+Plug 'roman/golden-ratio'
+
+" Autocomplete
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'honza/vim-snippets'
+
+" Lint
+" Plug 'w0rp/ale'
+
+" Language
+" let's put vim-go before vim-polyglot
+" see: https://github.com/fatih/vim-go/issues/2045 and https://github.com/sheerun/vim-polyglot/issues/309
+Plug 'fatih/vim-go'
+Plug 'sheerun/vim-polyglot'
+Plug 'rust-lang/rust.vim'
+" Plug 'mattn/emmet-vim'
+
+call plug#end()
+" }
+
+" 修改 leader 键
 let mapleader = ','
 let g:mapleader = ','
 
-" Enable filetype plugins and indention
+" 开启语法高亮
+syntax on
+set mouse=a
+
+" 检测文件类型
+filetype on
+" 针对不同的文件类型采用不同的缩进格式
+filetype indent on
+" 允许插件
+filetype plugin on
+" 启动自动补全
 filetype plugin indent on
 
-
-" No Uganda
+set autoread
 set shortmess=atI
-
-" No backup for saving space
 set nobackup
-" History maxsize
+set noswapfile
+
 set history=2000
 
-" Highlight the current line
-set cursorline
-" Highlight the current column
-set cursorcolumn
+set wildignore=*.swp,*.bak,*.pyc,*.class,.svn,*.o,*~
 
-" Keep on screen if exists
+" 防止误删，退出后显示
 set t_ti= t_te=
 
-" Fix issues of multi cursor
-set selection=inclusive
-set selectmode=mouse,key
-
+" change the terminal's title
+set title
+" 去掉输入错误的提示声音
 set novisualbell
 set noerrorbells
 set t_vb=
 set tm=500
-
-" Remember info about open buffers on close
 set viminfo^=%
-
-" For regular expressions turn magic on
+" for more powerful regex
 set magic
-
-" Show current line
 set ruler
-set number
-" Nowrap
-set nowrap
-
-" Show command
 set showcmd
-" Show mode
 set showmode
+set number
 set showmatch
 set matchtime=2
-" Highlight search matched
 set hlsearch
-" Case insensitive
 set incsearch
 set ignorecase
 set smartcase
+set foldenable
+set foldmethod=indent
+set foldlevel=99
+let g:FoldMethod = 0
 
-" Intent configs
+" use <leader>zz for toggle fold
+map <leader>zz :call ToggleFold()<cr>
+fun! ToggleFold()
+    if g:FoldMethod == 0
+        exe "normal! zM"
+        let g:FoldMethod = 1
+    else
+        exe "normal! zR"
+        let g:FoldMethod = 0
+    endif
+endfun
+
+" configs of ident
 set smartindent
-set autointent
-set smarttab
+set autoindent
 set tabstop=4
 set shiftwidth=4
 set softtabstop=4
+set smarttab
+" 将Tab自动转化成空格[需要输入真正的Tab键时，使用 Ctrl+V + Tab]
 set expandtab
-set shiftround
 
-" Show relative
+set hidden
+set wildmode=list:longest
+set ttyfast
+
+set nrformats=
+
+" 相对行号，快速跳行
 set relativenumber number
 au FocusLost * :set norelativenumber number
 au FocusGained * :set relativenumber
+" 插入模式下用绝对行号, 普通模式下用相对
 autocmd InsertEnter * :set norelativenumber number
 autocmd InsertLeave * :set relativenumber
 function! NumberToggle()
@@ -101,35 +161,34 @@ function! NumberToggle()
 endfunc
 nnoremap <C-n> :call NumberToggle()<cr>
 
-" about encoding
+if &term =~ '256color'
+  set t_ut=
+endif
+
 set encoding=utf-8
-set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
 set helplang=cn
 set termencoding=utf-8
+set ffs=unix,mac,dos
+set formatoptions+=m
+set formatoptions+=B
 
-set ffs=unix,dos,mac
+autocmd! bufwritepost .vimrc source %
 
+" 让Vim的补全菜单行为与一般IDE一致(参考VimTip1228)
 set completeopt=longest,menu
+set wildmenu
 
+" 打开自动定位到最后编辑的位置, 需要确认 .viminfo 当前用户可写
+if has("autocmd")
+  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
 
-" Wild ignore
-set wildignore+=*.dll,*.o,*.pyc,*.bak,*.exe,*.jpg,*.jpeg,*.png,*.gif,*$py.class,*.class,*/*.dSYM/*,*.dylib
-set wildmode=list:full
-
-
-" key map
-map <Left> <Nop>
-map <Right> <Nop>
-map <Up> <Nop>
-map <Down> <Nop>
-
-"Treat long lines as break lines (useful when moving around in them)
 nnoremap k gk
 nnoremap gk k
 nnoremap j gj
 nnoremap gj j
 
-noremap <F1> <Esc>"
+" F2 行号开关，用于鼠标复制代码用
 function! HideNumber()
   if(&relativenumber == &number)
     set relativenumber! number!
@@ -140,43 +199,37 @@ function! HideNumber()
   endif
   set number?
 endfunc
-nnoremap <F2> :call HideNumber()<CR>
-nnoremap <F3> :set list! list?<CR>
-nnoremap <F4> :set wrap! wrap?<CR>
-set pastetoggle=<F5>            "    when in insert mode, press <F5> to go to
-                                "    paste mode, where you can paste mass data
-                                "    that won't be autoindented
-nnoremap <F6> :exec exists('syntax_on') ? 'syn off' : 'syn on'<CR>
+
+set pastetoggle=<F3>
+" disbale paste mode when leaving insert mode
+au InsertLeave * set nopaste
+
 function! XTermPasteBegin()
   set pastetoggle=<Esc>[201~
   set paste
   return ""
 endfunction
 inoremap <special> <expr> <Esc>[200~ XTermPasteBegin()
-au InsertLeave * set nopaste
 
-" move between multipart windows
+
+" Smart way to move between windows
 map <C-j> <C-W>j
 map <C-k> <C-W>k
 map <C-h> <C-W>h
 map <C-l> <C-W>l
 
-" 模式增强, ctrl - a到行首， -e 到行尾
-cnoremap <C-j> <t_kd>
-cnoremap <C-k> <t_ku>
-cnoremap <C-a> <Home>
-cnoremap <C-e> <End>
-
+" 搜索相关
+" Map <Space> to / (search) and Ctrl-<Space> to ? (backwards search)
 map <space> /
+" 进入搜索Use sane regexes"
 nnoremap / /\v
 vnoremap / /\v
 
-" Keep search pattern at the center of the screen.
-nnoremap <silent> n nzz
-nnoremap <silent> N Nzz
-nnoremap <silent> * *zz
-nnoremap <silent> # #zz
-nnoremap <silent> g* g*zz
+autocmd FileType python set tabstop=4 shiftwidth=4 expandtab ai
+autocmd FileType ruby,javascript,html,css,xml set tabstop=2 shiftwidth=2 softtabstop=2 expandtab ai
+autocmd BufRead,BufNewFile *.md,*.mkd,*.markdown set filetype=markdown.mkd
+autocmd BufRead,BufNewFile *.part set filetype=html
+autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.html.javascript tabstop=2 shiftwidth=2 softtabstop=2 expandtab ai
 
 " 保存python文件时删除多余空格
 fun! <SID>StripTrailingWhitespaces()
@@ -187,169 +240,6 @@ fun! <SID>StripTrailingWhitespaces()
 endfun
 autocmd FileType c,cpp,java,go,php,javascript,puppet,python,rust,twig,xml,yml,perl autocmd BufWritePre <buffer> :call <SID>StripTrailingWhitespaces()
 
-fun! InsertUUID4()
-python << endpython
-if 1:
-    import uuid, vim
-    vim.command('return "%s"' % str(uuid.uuid4()))
-endpython
-endfun
-inoremap <c-u> <C-R>=InsertUUID4()<CR>
-
-" Colorcolumns
-if version >= 703
-  autocmd FileType * setlocal colorcolumn=0
-  " autocmd FileType ruby,python,javascript,c,cpp,objc,rst
-  "  \ let &colorcolumn="80,".join(range(84,300),",")
-  autocmd FileType ruby,python,javascript,c,cpp,objc,rst let &colorcolumn="80"
-endif
-
-" python support
-" --------------
-"  don't highlight exceptions and builtins. I love to override them in local
-"  scopes and it sucks ass if it's highlighted then. And for exceptions I
-"  don't really want to have different colors for my own exceptions ;-)
-autocmd FileType python setlocal expandtab shiftwidth=4 tabstop=8
-\ formatoptions=croqj softtabstop=4 textwidth=74 comments=:#\:,:#
-let python_highlight_all=1
-let python_highlight_exceptions=0
-let python_highlight_builtins=0
-let python_slow_sync=1
-
-"let g:syntastic_python_checkers=['flake8', 'python']
-let g:syntastic_python_checkers=[]
-
-" Don't warn on
-"   E121 continuation line indentation is not a multiple of four
-"   E128 continuation line under-indented for visual indent
-"   E711 comparison to None should be 'if cond is not None:'
-"   E301 expected 1 blank line, found 0
-"   E261 at least two spaces before inline comment
-"   E241 multiple spaces after ':'
-"   E124 closing bracket does not match visual indentation
-"   E126 continuation line over-indented for hanging indent
-"   E721 do not compare types, use 'isinstance()'
-let g:syntastic_python_flake8_args='--ignore=E121,E128,E711,E301,E261,E241,E124,E126,E721
-    \ --max-line-length=84'
-
-" ruby support
-" ------------
-autocmd FileType ruby setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
-autocmd BufNewFile,BufRead Podfile setlocal ft=ruby
-
-" go support
-" ----------
-autocmd BufNewFile,BufRead *.go setlocal ft=go
-autocmd FileType go setlocal shiftwidth=4 tabstop=4 softtabstop=4
-
-" php support
-" -----------
-autocmd FileType php setlocal shiftwidth=4 tabstop=8 softtabstop=4 expandtab
-
-" shell support
-" -----------
-autocmd FileType sh setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
-
-" template language support (SGML / XML too)
-" ------------------------------------------
-" and disable that stupid html rendering (like making stuff bold etc)
-autocmd FileType xml,html,htmljinja,htmldjango setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
-autocmd FileType html,htmljinja,htmldjango imap <buffer> <c-e> <Plug>SparkupExecute
-autocmd FileType html,htmljinja,htmldjango imap <buffer> <c-l> <Plug>SparkupNext
-autocmd FileType html setlocal commentstring=<!--\ %s\ -->
-autocmd FileType htmljinja setlocal commentstring={#\ %s\ #}
-let html_no_rendering=1
-let g:syntastic_html_checkers = []
-
-" CSS
-" ---
-autocmd FileType css setlocal expandtab shiftwidth=4 tabstop=4 softtabstop=4
-autocmd FileType css setlocal commentstring=/*\ %s\ */
-autocmd FileType css noremap <buffer> <leader>r :call CSSBeautify()<cr>
-
-" Less
-" ----
-autocmd FileType less setlocal expandtab shiftwidth=2 tabstop=8 softtabstop=2
-
-" Sass
-" ----
-autocmd FileType scss setlocal expandtab shiftwidth=2 tabstop=8 softtabstop=2
-
-" Java
-" ----
-autocmd FileType java setlocal shiftwidth=2 tabstop=8 softtabstop=2 expandtab
-autocmd FileType java setlocal commentstring=//\ %s
-
-" C/Obj-C/C++
-autocmd FileType c setlocal tabstop=4 softtabstop=4 shiftwidth=4 expandtab
-autocmd FileType cpp setlocal tabstop=4 softtabstop=4 shiftwidth=4 expandtab
-autocmd FileType objc setlocal tabstop=4 softtabstop=4 shiftwidth=4 expandtab
-autocmd FileType c setlocal commentstring=/*\ %s\ */
-autocmd FileType cpp,objc setlocal commentstring=//\ %s
-let c_no_curly_error=1
-let g:syntastic_cpp_include_dirs = ['include', '../include']
-let g:syntastic_cpp_compiler = 'clang++'
-let g:syntastic_c_include_dirs = ['include', '../include']
-let g:syntastic_c_compiler = 'clang'
-
-" vim
-" ---
-autocmd FileType vim setlocal expandtab shiftwidth=2 tabstop=8 softtabstop=2
-
-" Javascript
-" ----------
-autocmd FileType javascript setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
-autocmd FileType javascript setlocal commentstring=//\ %s
-autocmd FileType javascript noremap <buffer> <leader>r :call JsBeautify()<cr>
-autocmd FileType javascript let b:javascript_fold = 0
-let javascript_enable_domhtmlcss=1
-let g:syntastic_javascript_checkers = ['jshint'] 
-let g:syntastic_javascript_jshint_args='--config ~/.vim/extern-cfg/jshint.json'
-
-" JSON
-" ----
-autocmd FileType json setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
-
-" Typescript
-" ----------
-let g:syntastic_typescript_checkers = []
-
-" CoffeeScript
-" ------------
-autocmd FileType coffee setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
-
-" cmake support
-" -------------
-autocmd BufNewFile,BufRead CMakeLists.txt setlocal ft=cmake
-
-" Erlang support
-" --------------
-autocmd FileType erlang setlocal expandtab shiftwidth=2 tabstop=8 softtabstop=2
-autocmd BufNewFile,BufRead rebar.config setlocal ft=erlang
-
-" YAML support
-" ------------
-autocmd FileType yaml setlocal expandtab shiftwidth=2 tabstop=8 softtabstop=2
-autocmd BufNewFile,BufRead *.sls setlocal ft=yaml
-
-" Lua support
-" -----------
-autocmd FileType lua setlocal shiftwidth=2 tabstop=2 softtabstop=2
-
-" Groovy
-" ------
-autocmd FileType groovy setlocal shiftwidth=4 tabstop=8 softtabstop=4 expandtab
-
-" rust
-" ----
-autocmd FileType rust setlocal expandtab shiftwidth=4 tabstop=8 softtabstop=4
-autocmd FileType rust setlocal commentstring=//\ %s
-"let g:rustfmt_autosave = 1
-let g:syntastic_rust_checkers=[]
-"let g:racer_cmd = "/Users/mitsuhiko/.cargo/bin/racer"
-let $RUST_SRC_PATH="/Users/mitsuhiko/Development/rust/src"
-
-
 " 定义函数AutoSetFileHead，自动插入文件头
 autocmd BufNewFile *.sh,*.py exec ":call AutoSetFileHead()"
 function! AutoSetFileHead()
@@ -358,19 +248,12 @@ function! AutoSetFileHead()
         call setline(1, "\#!/bin/bash")
     endif
 
-    "如果文件类型为python
-    if &filetype == 'python'
-        " call setline(1, "\#!/usr/bin/env python")
-        " call append(1, "\# encoding: utf-8")
-        call setline(1, "\# -*- coding: utf-8 -*-")
-    endif
-
     normal G
     normal o
     normal o
 endfunc
 
-
+" 设置可以高亮的关键字
 if has("autocmd")
   " Highlight TODO, FIXME, NOTE, etc.
   if v:version > 701
@@ -379,8 +262,18 @@ if has("autocmd")
   endif
 endif
 
+" theme主题
+set t_Co=256
+set background=dark
+colorscheme onedark
+" colorscheme onedark
 
-" Always show a gutter
-sign define dummy
-autocmd BufEnter * execute 'sign place 9999 line=1 name=dummy buffer=' . bufnr('')
-autocmd! bufwritepost .vimrc source %
+" for error highlight，防止错误整行标红导致看不清
+highlight clear SpellBad
+highlight SpellBad term=standout ctermfg=1 term=underline cterm=underline
+highlight clear SpellCap
+highlight SpellCap term=underline cterm=underline
+highlight clear SpellRare
+highlight SpellRare term=underline cterm=underline
+highlight clear SpellLocal
+highlight SpellLocal term=underline cterm=underline
