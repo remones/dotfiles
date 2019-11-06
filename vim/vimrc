@@ -32,7 +32,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 
 " Tool
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'scrooloose/nerdtree' | Plug 'jistr/vim-nerdtree-tabs'
 Plug 'mbbill/undotree', { 'on': 'UndotreeToggle' }
 Plug 'svermeulen/vim-easyclip'
 Plug 'godlygeek/tabular'
@@ -50,7 +50,7 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'honza/vim-snippets'
 
 " Lint
-" Plug 'w0rp/ale'
+Plug 'w0rp/ale'
 
 " Language
 " let's put vim-go before vim-polyglot
@@ -58,7 +58,7 @@ Plug 'honza/vim-snippets'
 Plug 'fatih/vim-go'
 Plug 'sheerun/vim-polyglot'
 Plug 'rust-lang/rust.vim'
-" Plug 'mattn/emmet-vim'
+Plug 'mattn/emmet-vim'
 
 call plug#end()
 " }
@@ -91,6 +91,7 @@ set wildignore=*.swp,*.bak,*.pyc,*.class,.svn,*.o,*~
 
 " 防止误删，退出后显示
 set t_ti= t_te=
+set backspace=indent,eol,start
 
 " change the terminal's title
 set title
@@ -178,6 +179,50 @@ autocmd! bufwritepost .vimrc source %
 set completeopt=longest,menu
 set wildmenu
 
+" In the quickfix window, <CR> is used to jump to the error under the
+" cursor, so undefine the mapping there.
+autocmd BufReadPost quickfix nnoremap <buffer> <CR> <CR>
+" quickfix window  s/v to open in split window,  ,gd/,jd => quickfix window => open it
+autocmd BufReadPost quickfix nnoremap <buffer> v <C-w><Enter><C-w>L
+autocmd BufReadPost quickfix nnoremap <buffer> s <C-w><Enter><C-w>K
+
+" nerdtree nerdtreetabs {{{
+    "map <leader>n :NERDTreeToggle<CR>
+    let NERDTreeHighlightCursorline=1
+    let NERDTreeIgnore=[ '\.pyc$', '\.pyo$', '\.obj$', '\.o$', '\.so$', '\.egg$', '^\.git$', '^\.svn$', '^\.hg$' ]
+    "close vim if the only window left open is a NERDTree
+    autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | end
+    " s/v 分屏打开文件
+    let g:NERDTreeMapOpenSplit = 's'
+    let g:NERDTreeMapOpenVSplit = 'v'
+    " fix Nerdtree ^G before folder and file names OSX terminal vim
+    let g:NERDTreeNodeDelimiter = "\u00a0"
+
+
+    " nerdtreetabs
+    map <Leader>n <plug>NERDTreeTabsToggle<CR>
+    " 关闭同步
+    " let g:nerdtree_tabs_synchronize_view=0
+    " let g:nerdtree_tabs_synchronize_focus=0
+    " 是否自动开启nerdtree
+    " thank to @ListenerRi, see https://github.com/wklken/k-vim/issues/165
+    let g:nerdtree_tabs_open_on_console_startup=0
+    let g:nerdtree_tabs_open_on_gui_startup=0
+"}}}
+"
+"
+"
+"" golden ratio {
+let g:golden_ratio_autocommand = 0
+map <C-g> <Plug>(golden_ratio_resize)
+" }
+
+set rtp+=/usr/local/opt/fzf
+
+" fzf-vim {
+nnoremap <C-z> :Files<CR>
+
+
 " 打开自动定位到最后编辑的位置, 需要确认 .viminfo 当前用户可写
 if has("autocmd")
   au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
@@ -210,8 +255,6 @@ function! XTermPasteBegin()
   return ""
 endfunction
 inoremap <special> <expr> <Esc>[200~ XTermPasteBegin()
-
-
 " Smart way to move between windows
 map <C-j> <C-W>j
 map <C-k> <C-W>k
@@ -219,8 +262,6 @@ map <C-h> <C-W>h
 map <C-l> <C-W>l
 
 " 搜索相关
-" Map <Space> to / (search) and Ctrl-<Space> to ? (backwards search)
-map <space> /
 " 进入搜索Use sane regexes"
 nnoremap / /\v
 vnoremap / /\v
