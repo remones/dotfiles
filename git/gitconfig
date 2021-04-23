@@ -94,5 +94,7 @@
 [http]
 	proxy = socks5://127.0.0.1:1080 # should work with ShadowSocks
 [user]
-	name = wanqifei
-	email = wanqifei@yuanfudao.com
+	name = remones
+	email = remones11@gmail.com
+[includeIf "gitdir:~/work/"]
+    path = ~/work/.gitconfig
