@@ -21,6 +21,7 @@
 	changed = green
 	untracked = cyan
 [alias]
+    nb = checkout -b
     fb = "!f(){ git fetch \"$1\" && git rebase origin/master; };f"
     l = log --pretty=oneline --abbrev-commit
 	st = status -sb
@@ -90,3 +91,10 @@
 [mergetool "sourcetree"]
 	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
+[http]
+	proxy = socks5://127.0.0.1:1080 # should work with ShadowSocks
+[user]
+	name = remones
+	email = remones11@gmail.com
+[includeIf "gitdir:~/work/"]
+    path = ~/work/.gitconfig
