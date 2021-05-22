@@ -29,6 +29,7 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'tomtom/tcomment_vim'
 Plug 'alvan/vim-closetag'
 Plug 'dyng/ctrlsf.vim'
+Plug 'preservim/nerdcommenter'
 
 " Git
 Plug 'tpope/vim-fugitive'
@@ -225,6 +226,9 @@ set rtp+=/usr/local/opt/fzf
 
 " fzf-vim {
 nnoremap <C-z> :Files<CR>
+nmap <silent> gvd :call CocAction('jumpDefinition', 'vnew')<CR>
+nmap <silent> gxd :call CocAction('jumpDefinition', 'new')<CR>
+nmap <silent> gtd :call CocAction('jumpDefinition', 'tabnew')<CR>
 
 " Ag map
 nnoremap <C-a> :Ag<CR>
@@ -239,19 +243,9 @@ nnoremap gk k
 nnoremap j gj
 nnoremap gj j
 
-" F2 行号开关，用于鼠标复制代码用
-function! HideNumber()
-  if(&relativenumber == &number)
-    set relativenumber! number!
-  elseif(&number)
-    set number!
-  else
-    set relativenumber!
-  endif
-  set number?
-endfunc
+"
+nnoremap ,w <C-w>
 
-set pastetoggle=<F3>
 " disbale paste mode when leaving insert mode
 au InsertLeave * set nopaste
 
@@ -278,7 +272,7 @@ autocmd BufRead,BufNewFile *.md,*.mkd,*.markdown set filetype=markdown.mkd
 autocmd BufRead,BufNewFile *.part set filetype=html
 autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.html.javascript tabstop=2 shiftwidth=2 softtabstop=2 expandtab ai
 
-" 保存python文件时删除多余空格
+" 保存文件时删除多余空格
 fun! <SID>StripTrailingWhitespaces()
     let l = line(".")
     let c = col(".")
@@ -286,6 +280,10 @@ fun! <SID>StripTrailingWhitespaces()
     call cursor(l, c)
 endfun
 autocmd FileType c,cpp,java,go,php,javascript,puppet,python,rust,twig,xml,yml,perl autocmd BufWritePre <buffer> :call <SID>StripTrailingWhitespaces()
+
+" 保存文件时自动应用 coc-format
+autocmd BufWritePre *.ts,*.js,*.py,*.rb,*.go :silent call CocAction('runCommand', 'editor.action.organizeImport')
+
 
 " 定义函数AutoSetFileHead，自动插入文件头
 autocmd BufNewFile *.sh,*.py exec ":call AutoSetFileHead()"
@@ -404,6 +402,11 @@ nmap <leader>rn <Plug>(coc-rename)
 xmap <leader>f  <Plug>(coc-format-selected)
 nmap <leader>f  <Plug>(coc-format-selected)
 
+autocmd FileType go nmap gtj :CocCommand go.tags.add json<cr>
+autocmd FileType go nmap gty :CocCommand go.tags.add yaml<cr>
+autocmd FileType go nmap gtx :CocCommand go.tags.clear<cr>
+autocmd FileType go nmap gtd :CocCommand go.tags.add db<cr>
+
 augroup mygroup
   autocmd!
   " Setup formatexpr specified filetype(s).
@@ -443,9 +446,6 @@ command! -nargs=0 Format :call CocAction('format')
 
 " Add `:Fold` command to fold current buffer.
 command! -nargs=? Fold :call     CocAction('fold', <f-args>)
-
-" Add `:OR` command for organize imports of the current buffer.
-command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
 
 " Add (Neo)Vim's native statusline support.
 " NOTE: Please see `:h coc-status` for integrations with external plugins that
