@@ -323,7 +323,6 @@ highlight SpellRare term=underline cterm=underline
 highlight clear SpellLocal
 highlight SpellLocal term=underline cterm=underline
 
-
 " coc 配置相关
 
 " Give more space for displaying messages.
@@ -406,6 +405,7 @@ autocmd FileType go nmap gtj :CocCommand go.tags.add json<cr>
 autocmd FileType go nmap gty :CocCommand go.tags.add yaml<cr>
 autocmd FileType go nmap gtx :CocCommand go.tags.clear<cr>
 autocmd FileType go nmap gtd :CocCommand go.tags.add db<cr>
+autocmd FileType go nmap gtt :CocCommand go.tags.add toml<cr>
 
 augroup mygroup
   autocmd!
