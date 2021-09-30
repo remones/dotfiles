@@ -19,6 +19,8 @@ Plug 'nightsense/cosmic_latte'
 Plug 'liuchengxu/space-vim-theme'
 Plug 'rafalbromirski/vim-aurora'
 
+" highlight
+Plug 'jackguo380/vim-lsp-cxx-highlight'
 
 " Effective
 Plug 'tpope/vim-repeat'
